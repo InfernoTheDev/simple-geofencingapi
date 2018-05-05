@@ -2,19 +2,21 @@ package com.illnino.geofencingapi
 
 import android.Manifest
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.location.LocationProvider
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
-import com.google.android.gms.location.Geofence
-import com.google.android.gms.location.GeofencingClient
-import com.google.android.gms.location.GeofencingRequest
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.illnino.geofencingapi.R.id.toolbar
 import kotlinx.android.synthetic.main.activity_main.*
+import java.security.Provider
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     lateinit var geofencingClient: GeofencingClient
+    var locationManager: LocationManager? = null
 
     private val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(this, GeofenceTransitionsIntentService::class.java)
@@ -54,10 +57,57 @@ class MainActivity : AppCompatActivity() {
         }.build()
     }
 
+    val locationListeners = arrayOf(
+            LTRLocationListener(LocationManager.GPS_PROVIDER),
+            LTRLocationListener(LocationManager.NETWORK_PROVIDER)
+    )
+
+    class LTRLocationListener(provider: String) : android.location.LocationListener {
+
+        val lastLocation = Location(provider)
+
+        override fun onLocationChanged(location: Location?) {
+            lastLocation.set(location)
+
+            Log.d(TAG, "onLocationChanged: ${location?.latitude}, ${location?.longitude}")
+            // TODO: Do something here
+        }
+
+        override fun onProviderDisabled(provider: String?) {
+        }
+
+        override fun onProviderEnabled(provider: String?) {
+        }
+
+        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+            Log.d(TAG, "onStatusChanged $provider, status: $status")
+
+            if (extras != null) {
+                for (i in extras.keySet()) {
+                    Log.d(TAG, "extras: ${extras[i]}")
+                }
+            }
+        }
+
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        // Create persistent LocationManager reference
+        if (locationManager == null)
+            locationManager = applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        try {
+            locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0F, locationListeners[0])
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Fail to request location update", e)
+        } catch (e: IllegalArgumentException) {
+            Log.e(TAG, "GPS provider does not exist", e)
+        }
+
 
         geofencingClient = LocationServices.getGeofencingClient(this)
 
@@ -79,6 +129,13 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             Toast.makeText(this, "Permission Denied !!", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    //define the listener
+    private val locationListener: LocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            //thetext.setText("" + location.longitude + ":" + location.latitude);
         }
     }
 
