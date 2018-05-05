@@ -42,14 +42,29 @@ class MainActivity : AppCompatActivity() {
                 .setCircularRegion(
                         12.897571,
                         100.903045,
-                        10F
+                        30F
                 )
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
                 //.setLoiteringDelay(2000)
                 .build()
 
+        val secondStop = Geofence.Builder()
+                .setRequestId("second")
+                .setCircularRegion(
+                        12.880406,
+                        100.896343,
+                        30F
+                )
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+                //.setLoiteringDelay(2000)
+                .build()
+
+
+
         geofenceList.add(firstStop)
+        geofenceList.add(secondStop)
 
         return GeofencingRequest.Builder().apply {
             setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
