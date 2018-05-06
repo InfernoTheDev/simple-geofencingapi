@@ -1,6 +1,7 @@
 package com.illnino.geofencingapi
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -23,14 +24,19 @@ class MainActivity : AppCompatActivity() {
     companion object {
         val TAG: String? = MainActivity::class.simpleName
     }
-
-    lateinit var geofencingClient: GeofencingClient
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationCallback: LocationCallback
+    private lateinit var geofencingClient: GeofencingClient
+    private lateinit var locationRequest: LocationRequest
     var locationManager: LocationManager? = null
 
     private val geofencePendingIntent: PendingIntent by lazy {
+        Toast.makeText(this, "Add Pending Intent", Toast.LENGTH_LONG).show()
+        //val intent = Intent("com.illnino.geofencingapi.ACTION_RECEIVE_GEOFENCE")
         val intent = Intent(this, GeofenceTransitionsIntentService::class.java)
         // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
         // addGeofences() and removeGeofences().
+        //PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
@@ -42,32 +48,17 @@ class MainActivity : AppCompatActivity() {
                 .setCircularRegion(
                         12.897571,
                         100.903045,
-                        30F
+                        10F
                 )
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
                 //.setLoiteringDelay(2000)
                 .build()
-
-        val secondStop = Geofence.Builder()
-                .setRequestId("second")
-                .setCircularRegion(
-                        12.880406,
-                        100.896343,
-                        30F
-                )
-                .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
-                //.setLoiteringDelay(2000)
-                .build()
-
-
 
         geofenceList.add(firstStop)
-        geofenceList.add(secondStop)
 
         return GeofencingRequest.Builder().apply {
-            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
+            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
             addGeofences(geofenceList)
         }.build()
     }
@@ -106,6 +97,37 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    fun createLocationRequest(): LocationRequest {
+        return LocationRequest().apply {
+            interval = 2000
+            fastestInterval = 1000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun startLocationUpdates() {
+        fusedLocationClient
+                .requestLocationUpdates(
+                        locationRequest,
+                        locationCallback,
+                        null)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startLocationUpdates()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+
+    private fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,7 +135,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         // Create persistent LocationManager reference
-        if (locationManager == null)
+        /*if (locationManager == null)
             locationManager = applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         try {
             locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0F, locationListeners[0])
@@ -121,10 +143,20 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, "Fail to request location update", e)
         } catch (e: IllegalArgumentException) {
             Log.e(TAG, "GPS provider does not exist", e)
-        }
+        }*/
 
-
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         geofencingClient = LocationServices.getGeofencingClient(this)
+        locationRequest = createLocationRequest()
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult?) {
+                locationResult ?: return
+                for (location in locationResult.locations){
+                    Log.d(TAG, "onLocationResult: ${location?.latitude}, ${location?.longitude}")
+                }
+            }
+        }
 
         val permission = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -132,7 +164,9 @@ class MainActivity : AppCompatActivity() {
         if (permission == PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Add Geofencing !!", Toast.LENGTH_LONG).show()
             Log.d(TAG, "Add Geofencing !!")
+
             geofencingClient.addGeofences(getGeofencingRequest(), geofencePendingIntent).run {
+
                 addOnSuccessListener {
                     //Toast.makeText(applicationContext, "geofencingClient add success", Toast.LENGTH_LONG).show()
                     Log.d(TAG, "geofencingClient add success")
@@ -142,6 +176,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, "geofencingClient add fail ${it.message}")
                 }
             }
+
         } else {
             Toast.makeText(this, "Permission Denied !!", Toast.LENGTH_LONG).show()
         }
