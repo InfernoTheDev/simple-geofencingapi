@@ -27,7 +27,7 @@
                 <action android:name="com.illnino.geofencingapi.ACTION_RECEIVE_GEOFENCE"></action>
             </intent-filter>
         </receiver>-->
-        <service android:name=".GeofenceTransitionsIntentService"></service>
+        <service android:name=".MainActivity$GeofenceTransitionsIntentService"></service>
     </application>
 
 </manifest>
