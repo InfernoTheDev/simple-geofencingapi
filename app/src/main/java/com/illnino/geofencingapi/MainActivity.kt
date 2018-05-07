@@ -127,10 +127,7 @@ class MainActivity : AppCompatActivity() {
 
         val firstStop = Geofence.Builder().apply {
             setRequestId("Voova")
-            setCircularRegion(
-                    12.880310,
-                    100.895110,
-                    20F)
+            setCircularRegion(12.880350, 100.895056, 20F)
             setExpirationDuration(Geofence.NEVER_EXPIRE)
             //setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
             setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or GeofencingRequest.INITIAL_TRIGGER_EXIT)
@@ -139,11 +136,8 @@ class MainActivity : AppCompatActivity() {
 
 
         val secondStop = Geofence.Builder().apply {
-            setRequestId("7-11 Seven-Eleven")
-            setCircularRegion(
-                    12.880023,
-                    100.894688,
-                    20F)
+            setRequestId("Now place next to 7-11 Seven-Eleven")
+            setCircularRegion(12.880040, 100.894633, 20F)
             setExpirationDuration(Geofence.NEVER_EXPIRE)
             //setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
             setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or GeofencingRequest.INITIAL_TRIGGER_EXIT)
@@ -151,12 +145,8 @@ class MainActivity : AppCompatActivity() {
         }.build()
 
         val thirdStop = Geofence.Builder().apply {
-            setRequestId("Whale Marina Condo showroom")
-            setCircularRegion(
-                    12.880408,
-                    100.895835,
-                    20F
-            )
+            setRequestId("Aunty's restaurant")
+            setCircularRegion(12.880608, 100.895997, 20F)
             setExpirationDuration(Geofence.NEVER_EXPIRE)
             //setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
             setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or GeofencingRequest.INITIAL_TRIGGER_EXIT)
@@ -226,7 +216,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, status)
                 MainActivity
                         .getInstance
-                        .updateDisplayView("Status: $status, $name")
+                        .updateDisplayView("\n====\nStatus: $status, $name\n====")
                 Toast.makeText(context, "Status: $status, $name", Toast.LENGTH_LONG).show()
             } else {
                 // Log the error.
