@@ -20,6 +20,8 @@ import android.widget.Toast
 import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_main.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -85,7 +87,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateDisplayView(txt: String){
-        tv_display_status.append(txt + "\n")
+        val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+        val currentDate = sdf.format(Date())
+        tv_display_status.append("$currentDate: $txt\n")
         //sv_display.fullScroll(View.FOCUS_DOWN)
     }
 
