@@ -102,6 +102,14 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         stopLocationUpdates()
+        geofencingClient?.removeGeofences(geofencePendingIntent)?.run {
+            addOnSuccessListener {
+                Log.d(TAG, "Success to RemoveGeofences")
+            }
+            addOnFailureListener {
+                Log.d(TAG, "Failur to RemoveGeofences")
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -131,7 +139,7 @@ class MainActivity : AppCompatActivity() {
 
         val firstStop = Geofence.Builder().apply {
             setRequestId("Voova")
-            setCircularRegion(12.880350, 100.895056, 20F)
+            setCircularRegion(12.880350, 100.895056, 15F)
             setExpirationDuration(Geofence.NEVER_EXPIRE)
             //setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
             setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or GeofencingRequest.INITIAL_TRIGGER_EXIT)
@@ -140,8 +148,8 @@ class MainActivity : AppCompatActivity() {
 
 
         val secondStop = Geofence.Builder().apply {
-            setRequestId("Now place next to 7-11 Seven-Eleven")
-            setCircularRegion(12.880040, 100.894633, 20F)
+            setRequestId("Sea max condo")
+            setCircularRegion(12.880096, 100.894160, 15F)
             setExpirationDuration(Geofence.NEVER_EXPIRE)
             //setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
             setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or GeofencingRequest.INITIAL_TRIGGER_EXIT)
@@ -150,7 +158,16 @@ class MainActivity : AppCompatActivity() {
 
         val thirdStop = Geofence.Builder().apply {
             setRequestId("Aunty's restaurant")
-            setCircularRegion(12.880608, 100.895997, 20F)
+            setCircularRegion(12.880608, 100.895997, 15F)
+            setExpirationDuration(Geofence.NEVER_EXPIRE)
+            //setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+            setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or GeofencingRequest.INITIAL_TRIGGER_EXIT)
+            setLoiteringDelay(5000)
+        }.build()
+
+        val fourthStop = Geofence.Builder().apply {
+            setRequestId("Beach Police Booth Chaiyaphruek Rd")
+            setCircularRegion(12.877134, 100.885354, 15F)
             setExpirationDuration(Geofence.NEVER_EXPIRE)
             //setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
             setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or GeofencingRequest.INITIAL_TRIGGER_EXIT)
@@ -160,6 +177,7 @@ class MainActivity : AppCompatActivity() {
         geofenceList.add(firstStop)
         geofenceList.add(secondStop)
         geofenceList.add(thirdStop)
+        geofenceList.add(fourthStop)
 
         return GeofencingRequest.Builder().apply {
             setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER)
