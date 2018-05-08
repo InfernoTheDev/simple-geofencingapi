@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
 
         val secondStop = Geofence.Builder().apply {
             setRequestId("Sea max condo")
-            setCircularRegion(12.880096, 100.894160, 15F)
+            setCircularRegion(12.879973, 100.894314, 15F)
             setExpirationDuration(Geofence.NEVER_EXPIRE)
             //setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
             setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or GeofencingRequest.INITIAL_TRIGGER_EXIT)
@@ -158,7 +158,7 @@ class MainActivity : AppCompatActivity() {
 
         val thirdStop = Geofence.Builder().apply {
             setRequestId("Aunty's restaurant")
-            setCircularRegion(12.880608, 100.895997, 15F)
+            setCircularRegion(12.880558, 100.896136, 15F)
             setExpirationDuration(Geofence.NEVER_EXPIRE)
             //setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
             setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or GeofencingRequest.INITIAL_TRIGGER_EXIT)
